@@ -1,0 +1,20 @@
+luxwallet/ios
+Copyright (c) 2024-present Lux Industries Inc.
+
+This product is licensed under the MIT License (see LICENSE) and includes
+software developed by third parties under the MIT License. Their original
+copyright notices are retained below as required by the MIT License.
+
+================================================================================
+Derived from: Unstoppable Wallet (iOS)
+Copyright (c) 2020 Horizontal Systems <hsdao@protonmail.ch>
+Licensed under the MIT License.
+
+This repository began as a fork of Horizontal Systems' Unstoppable Wallet for
+iOS. The WalletCore package, adapters, keychain handling, and dApp browser
+derive from that work.
+================================================================================
+
+Modifications and additions by Lux Industries Inc. are likewise MIT licensed.
+"Lux", "Lux Wallet", and associated logos are trademarks of Lux Industries Inc.;
+trademark rights are not granted by the MIT License (see LICENSE).
