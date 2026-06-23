@@ -9,6 +9,14 @@ public struct OidcSession: Codable {
     public let idToken: String?
     public let expiresAt: TimeInterval // unix seconds
     public let scope: String?
+
+    public init(accessToken: String, refreshToken: String?, idToken: String?, expiresAt: TimeInterval, scope: String?) {
+        self.accessToken = accessToken
+        self.refreshToken = refreshToken
+        self.idToken = idToken
+        self.expiresAt = expiresAt
+        self.scope = scope
+    }
 }
 
 public enum OidcError: Error {
@@ -70,6 +78,13 @@ public final class OidcAuthManager: NSObject {
             return nil
         }
         return try? JSONDecoder().decode(OidcSession.self, from: data)
+    }
+
+    /// Persist a session produced outside the PKCE web flow — e.g. a Web3 / SIWx
+    /// login completed in the @hanzo/gui RN screen and handed back over the
+    /// LuxSession bridge. Same keychain as the OIDC path; one way in.
+    public func setSession(_ session: OidcSession) throws {
+        try persist(session: session)
     }
 
     public func accessToken() -> String? {
