@@ -104,6 +104,7 @@ public class Core {
 
     let appBackupProvider: AppBackupProvider
     let cloudBackupManager: CloudBackupManager
+    public let oidcAuthManager: OidcAuthManager
 
     let statManager: StatManager
 
@@ -385,6 +386,9 @@ public class Core {
             appBackupProvider: appBackupProvider,
             logger: logger
         )
+
+        // IAM (hanzo.id) OIDC — layered over AccountManager + CloudBackupManager; sign-in is user-initiated.
+        oidcAuthManager = OidcAuthManager(keychainStorage: keychainStorage)
 
         purchaseManager = PurchaseManager(localStorage: localStorage)
 
