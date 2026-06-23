@@ -45,6 +45,16 @@ extension EvmSyncSourceManager {
         syncSourcesUpdatedRelay.asObservable()
     }
 
+    private func gatewaySyncSource(blockchainType: BlockchainType) -> EvmSyncSource? {
+        AppConfig.gatewayRpcUrl(blockchainType: blockchainType).map { url in
+            EvmSyncSource(
+                name: "Lux Gateway",
+                rpcSource: .http(urls: [url], auth: nil),
+                transactionSource: defaultTransactionSource(blockchainType: blockchainType)
+            )
+        }
+    }
+
     func defaultSyncSources(blockchainType: BlockchainType) -> [EvmSyncSource] {
         switch blockchainType {
         case .ethereum:
@@ -60,7 +70,7 @@ extension EvmSyncSourceManager {
                     ),
                 ]
             } else {
-                return [
+                return ([gatewaySyncSource(blockchainType: blockchainType)].compactMap { $0 }) + [
                     EvmSyncSource(
                         name: "BlocksDecoded",
                         rpcSource: .http(urls: [URL(string: "\(AppConfig.marketApiUrl)/v1/ethereum-rpc/mainnet")!], auth: nil),
@@ -86,7 +96,7 @@ extension EvmSyncSourceManager {
                     ),
                 ]
             } else {
-                return [
+                return ([gatewaySyncSource(blockchainType: blockchainType)].compactMap { $0 }) + [
                     EvmSyncSource(
                         name: "Binance",
                         rpcSource: .binanceSmartChainHttp(),
@@ -115,7 +125,7 @@ extension EvmSyncSourceManager {
                 ]
             }
         case .polygon:
-            return [
+            return ([gatewaySyncSource(blockchainType: blockchainType)].compactMap { $0 }) + [
                 EvmSyncSource(
                     name: "Polygon RPC",
                     rpcSource: .polygonRpcHttp(),
@@ -128,7 +138,7 @@ extension EvmSyncSourceManager {
                 ),
             ]
         case .avalanche:
-            return [
+            return ([gatewaySyncSource(blockchainType: blockchainType)].compactMap { $0 }) + [
                 EvmSyncSource(
                     name: "Avax Network",
                     rpcSource: .avaxNetworkHttp(),
@@ -141,7 +151,7 @@ extension EvmSyncSourceManager {
                 ),
             ]
         case .optimism:
-            return [
+            return ([gatewaySyncSource(blockchainType: blockchainType)].compactMap { $0 }) + [
                 EvmSyncSource(
                     name: "Optimism",
                     rpcSource: .optimismRpcHttp(),
@@ -154,7 +164,7 @@ extension EvmSyncSourceManager {
                 ),
             ]
         case .arbitrumOne:
-            return [
+            return ([gatewaySyncSource(blockchainType: blockchainType)].compactMap { $0 }) + [
                 EvmSyncSource(
                     name: "Arbitrum",
                     rpcSource: .arbitrumOneRpcHttp(),
@@ -167,7 +177,7 @@ extension EvmSyncSourceManager {
                 ),
             ]
         case .gnosis:
-            return [
+            return ([gatewaySyncSource(blockchainType: blockchainType)].compactMap { $0 }) + [
                 EvmSyncSource(
                     name: "Gnosis Chain",
                     rpcSource: .gnosisRpcHttp(),
@@ -180,7 +190,7 @@ extension EvmSyncSourceManager {
                 ),
             ]
         case .fantom:
-            return [
+            return ([gatewaySyncSource(blockchainType: blockchainType)].compactMap { $0 }) + [
                 EvmSyncSource(
                     name: "Fantom Chain",
                     rpcSource: .fantomRpcHttp(),
@@ -198,7 +208,7 @@ extension EvmSyncSourceManager {
                 ),
             ]
         case .base:
-            return [
+            return ([gatewaySyncSource(blockchainType: blockchainType)].compactMap { $0 }) + [
                 EvmSyncSource(
                     name: "Base",
                     rpcSource: .baseRpcHttp(),
@@ -216,7 +226,7 @@ extension EvmSyncSourceManager {
                 ),
             ]
         case .zkSync:
-            return [
+            return ([gatewaySyncSource(blockchainType: blockchainType)].compactMap { $0 }) + [
                 EvmSyncSource(
                     name: "ZKsync",
                     rpcSource: .zkSyncRpcHttp(),
