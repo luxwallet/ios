@@ -78,6 +78,28 @@ enum AppConfig {
         AppEnvironment.config.swapApiUrl
     }
 
+    static let gatewayRpcBaseUrl = "https://api.lux.network"
+
+    // Routes EVM RPC through the Lux gateway: https://<gateway>/v1/rpc/<chainId>.
+    // Returns nil for chains without a gateway route so callers keep their existing fallback.
+    static func gatewayRpcUrl(blockchainType: BlockchainType) -> URL? {
+        let chainId: Int
+        switch blockchainType {
+        case .ethereum: chainId = 1
+        case .binanceSmartChain: chainId = 56
+        case .polygon: chainId = 137
+        case .avalanche: chainId = 43114
+        case .optimism: chainId = 10
+        case .base: chainId = 8453
+        case .zkSync: chainId = 324
+        case .arbitrumOne: chainId = 42161
+        case .gnosis: chainId = 100
+        case .fantom: chainId = 250
+        default: return nil
+        }
+        return URL(string: "\(gatewayRpcBaseUrl)/v1/rpc/\(chainId)")
+    }
+
     static var etherscanKeys: [String] {
         ((Bundle.main.object(forInfoDictionaryKey: "EtherscanApiKeys") as? String) ?? "").components(separatedBy: ",")
     }
