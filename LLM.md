@@ -21,8 +21,7 @@ Guidance for AI agents. Fork lineage: Unstoppable Wallet (Horizontal Systems).
 
 Runs on the **arcd macOS fleet** (`dbc-luxfi-macos` — exact-host pin for
 Keychain + Xcode + iOS SDKs; `.github/actionlint.yaml` registers the pools).
-**No GitHub-hosted runners** (the legacy `deploy_appstore.yml`/`deploy_dev.yml`
-use `macos-26` + Fastlane/`match`; they are superseded by `release.yml`).
+**No GitHub-hosted runners.**
 Triggered by `workflow_dispatch` (brand = all|lux|hanzo|zoo,
 `upload-testflight` toggle) or a `v*` tag.
 
@@ -55,10 +54,19 @@ PREREQUISITES for non-lux brands: bundle ids `network.hanzo.wallet` /
 profiles before they can sign; lux (`network.lux.wallet`) is wired today.
 Per-brand app icons (`AppIcon` alternates) are the remaining logo wiring.
 
+## Legacy fork-CI purge (arcd-only)
+
+The Unstoppable-fork CI used forbidden GitHub-hosted runners and is superseded
+by `release.yml`. DELETED: `deploy_appstore.yml` + `deploy_dev.yml`
+(`macos-26` Fastlane/`match` TestFlight + Firebase deploys wired to upstream
+Unstoppable/Maya/Thorchain secrets), `notify_telegram.yml` + `translate.yml`
+(telegram / crowdin fork noise). None retargeted — all upstream-only plumbing.
+
 ## Rules
 
 1. Update THIS file; never create scratch summary files.
-2. arcd pools only — never `macos-latest`/`macos-26`.
+2. arcd pools only — never `macos-latest`/`macos-26`; the fork workflows that
+   used them were purged. `release.yml` is the one build+sign path.
 3. Signing via `hanzoai/ci-signing`; never put a cert/profile/secret in the
    repo (the `match` repo + API-key xcconfig are the only signing inputs, and
    secrets come from org secrets via `secrets: inherit`).
