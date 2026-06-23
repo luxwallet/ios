@@ -1,0 +1,13 @@
+# Self-hosted arcd runner pool labels (see hanzoai/.github RUNNERS.md).
+# These are NOT GitHub-hosted runners — arcd serves luxfi/hanzoai/zooai/parsdao/zenlm.
+# Registering them here lets actionlint validate `runs-on:` against our real pools.
+self-hosted-runner:
+  labels:
+    - luxfi-macos-arm64
+    - luxfi-linux-amd64
+    - luxfi-linux-arm64
+    - luxfi-windows-amd64
+    - luxfi-wsl
+    - dbc-luxfi-macos
+    - evo-luxfi-windows
+    - spark-luxfi-linux

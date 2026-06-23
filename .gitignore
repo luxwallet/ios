@@ -52,3 +52,6 @@ buildServer.json
 /.serena/
 /.venv-translate/
 /CLAUDE.md
+
+# Baked per-brand config emitted by @luxwallet/brand at build time (CI artifact).
+Unstoppable/Unstoppable/Resources/brand.json

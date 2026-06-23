@@ -1,0 +1,143 @@
+name: release
+
+# Canonical native release for the Lux iOS wallet (Swift / Xcode).
+#
+# Per BRAND (lux|hanzo|zoo), build a .xcarchive on the arcd macOS fleet (NEVER
+# GitHub-hosted), then export an App-Store-signed .ipa via hanzoai/ci-signing
+# sign-ios.yml (org Apple Distribution cert + provisioning profile). The signed
+# .ipa publishes to a GitHub Release (TestFlight upload is opt-in via the
+# sign-ios upload-testflight input).
+#
+# Brand is BAKED at archive time: emit-brand (@luxwallet/brand) writes
+# brand.json into the app resources and supplies the display name; xcodebuild
+# overrides APP_DISPLAY_NAME / ASSETCATALOG_COMPILER_APPICON_NAME /
+# PRODUCT_BUNDLE_IDENTIFIER per brand.
+#
+# NOTE: non-lux bundle ids (network.hanzo.wallet, network.zoo.wallet) need their
+# own App Store provisioning profiles + app records before they can sign; lux
+# (network.lux.wallet) is wired today.
+
+on:
+  workflow_dispatch:
+    inputs:
+      brand:
+        description: Brand to build
+        type: choice
+        options: [all, lux, hanzo, zoo]
+        default: all
+      upload-testflight:
+        description: Upload the signed build to TestFlight
+        type: boolean
+        default: false
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    runs-on: [luxfi-macos-arm64]
+    outputs:
+      brands: ${{ steps.matrix.outputs.brands }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: matrix
+        run: |
+          set -euo pipefail
+          B='${{ github.event.inputs.brand }}'
+          if [ -n "$B" ] && [ "$B" != "all" ]; then
+            echo "brands=[\"$B\"]" >> "$GITHUB_OUTPUT"
+          else
+            echo 'brands=["lux","hanzo","zoo"]' >> "$GITHUB_OUTPUT"
+          fi
+
+  # Build the .xcarchive per brand on a native macOS arcd runner.
+  build:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        brand: ${{ fromJSON(needs.prepare.outputs.brands) }}
+    runs-on: [dbc-luxfi-macos]   # exact-host pin: Keychain + Xcode + iOS SDKs
+    env:
+      WORKSPACE: Wallet.xcworkspace
+      SCHEME: Production
+      CONFIGURATION: Release-Prod
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Bake brand (@luxwallet/brand -> brand.json + env)
+        run: |
+          set -euo pipefail
+          npx --yes -p @luxwallet/brand@latest -p @luxwallet/chains@latest \
+            emit-brand "${{ matrix.brand }}" Unstoppable/Unstoppable/Resources >> "$GITHUB_ENV"
+          test -f Unstoppable/Unstoppable/Resources/brand.json
+
+      - name: Materialize Config.xcconfig from template
+        run: |
+          set -euo pipefail
+          cp Unstoppable/Unstoppable/Configuration/Config.template.xcconfig \
+             Unstoppable/Unstoppable/Configuration/Config.xcconfig
+
+      - name: Resolve Swift packages
+        run: xcodebuild -resolvePackageDependencies -workspace "$WORKSPACE" -scheme "$SCHEME"
+
+      - name: Archive (unsigned; ci-signing signs on export)
+        run: |
+          set -euo pipefail
+          BUNDLE_ID="${{ matrix.brand == 'lux' && 'network.lux.wallet' || format('network.{0}.wallet', matrix.brand) }}"
+          mkdir -p "$RUNNER_TEMP/stage"
+          : > "$RUNNER_TEMP/stage/.keep"   # sibling marker so the artifact keeps the Lux.xcarchive/ dir
+          xcodebuild archive \
+            -workspace "$WORKSPACE" \
+            -scheme "$SCHEME" \
+            -configuration "$CONFIGURATION" \
+            -archivePath "$RUNNER_TEMP/stage/Lux.xcarchive" \
+            -destination 'generic/platform=iOS' \
+            APP_DISPLAY_NAME="${{ env.BRAND_NAME }}" \
+            PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
+            CODE_SIGNING_ALLOWED=NO \
+            -allowProvisioningUpdates
+
+      # Upload the staging dir so the artifact preserves the Lux.xcarchive/
+      # directory (sign-ios.yml expects $RUNNER_TEMP/ar/Lux.xcarchive).
+      - uses: actions/upload-artifact@v4
+        with:
+          name: luxwallet-${{ matrix.brand }}-ios-archive
+          path: ${{ runner.temp }}/stage/**
+          if-no-files-found: error
+
+  # Export an App-Store-signed .ipa from the archive (org cert + profile).
+  sign-ios:
+    needs: [prepare, build]
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        brand: ${{ fromJSON(needs.prepare.outputs.brands) }}
+    uses: hanzoai/ci-signing/.github/workflows/sign-ios.yml@v1
+    with:
+      archive-artifact-name: luxwallet-${{ matrix.brand }}-ios-archive
+      archive-name: Lux.xcarchive
+      export-method: app-store
+      upload-testflight: ${{ github.event.inputs.upload-testflight == 'true' }}
+      runs-on: '["dbc-luxfi-macos"]'
+    secrets: inherit
+
+  publish-release:
+    needs: sign-ios
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    runs-on: [luxfi-macos-arm64]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**/*.ipa
+          fail_on_unmatched_files: false
