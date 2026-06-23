@@ -11,8 +11,8 @@
 	</array>
 	<key>com.apple.developer.icloud-container-identifiers</key>
 	<array>
-		<string>iCloud.io.horizontalsystems.bank-wallet</string>
-		<string>iCloud.io.horizontalsystems.bank-wallet.shared</string>
+		<string>iCloud.network.lux.wallet</string>
+		<string>iCloud.network.lux.wallet.shared</string>
 	</array>
 	<key>com.apple.developer.icloud-services</key>
 	<array>
@@ -20,7 +20,7 @@
 	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.io.horizontalsystems.bank-wallet</string>
+		<string>group.network.lux.wallet</string>
 	</array>
 </dict>
 </plist>

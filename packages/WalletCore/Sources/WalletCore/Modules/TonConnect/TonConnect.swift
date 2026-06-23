@@ -14,7 +14,7 @@ enum TonConnect {
 
     struct DeviceInfo: Encodable {
         let platform = "iphone"
-        let appName = "Unstoppable Wallet"
+        let appName = "Lux Wallet"
         let appVersion = AppConfig.appVersion
         let maxProtocolVersion = 2
         let features = [
