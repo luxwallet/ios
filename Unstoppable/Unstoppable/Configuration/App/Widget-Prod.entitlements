@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.io.horizontalsystems.bank-wallet</string>
+		<string>group.network.lux.wallet</string>
 	</array>
 </dict>
 </plist>

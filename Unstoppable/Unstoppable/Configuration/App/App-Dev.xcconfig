@@ -1,11 +1,11 @@
 #include "../Config.xcconfig"
 
-PRODUCT_BUNDLE_IDENTIFIER = io.horizontalsystems.bank-wallet.dev
-APP_DISPLAY_NAME = Unstoppable D
+PRODUCT_BUNDLE_IDENTIFIER = network.lux.wallet.dev
+APP_DISPLAY_NAME = Lux Wallet D
 CODE_SIGN_ENTITLEMENTS = Unstoppable/Configuration/App/App-Dev.entitlements
-PROVISIONING_PROFILE_SPECIFIER[config=Debug-Dev] = match Development io.horizontalsystems.bank-wallet.dev
-PROVISIONING_PROFILE_SPECIFIER[config=Release-Dev] = match AdHoc io.horizontalsystems.bank-wallet.dev
+PROVISIONING_PROFILE_SPECIFIER[config=Debug-Dev] = match Development network.lux.wallet.dev
+PROVISIONING_PROFILE_SPECIFIER[config=Release-Dev] = match AdHoc network.lux.wallet.dev
 ASSETCATALOG_COMPILER_APPICON_NAME = AppIconDev
 
-SHARED_CLOUD_CONTAINER_ID = iCloud.io.horizontalsystems.bank-wallet.shared.dev
-PRIVATE_CLOUD_CONTAINER_ID = iCloud.io.horizontalsystems.bank-wallet.dev
+SHARED_CLOUD_CONTAINER_ID = iCloud.network.lux.wallet.shared.dev
+PRIVATE_CLOUD_CONTAINER_ID = iCloud.network.lux.wallet.dev
