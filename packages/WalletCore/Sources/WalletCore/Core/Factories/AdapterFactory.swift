@@ -263,6 +263,8 @@ extension AdapterFactory {
                 return SplAdapter(solanaKit: solanaKit, mintAddress: mintAddress)
             }
 
+        // XRP: pending ripple-kit -> case .ripple: return RippleAdapter(rippleKitManager.kitWrapper(account: wallet.account))
+
         default: ()
         }
 

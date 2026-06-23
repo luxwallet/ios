@@ -254,6 +254,8 @@ public class Core {
         tonKitManager = TonKitManager(restoreStateManager: restoreStateManager, marketKit: marketKit, walletManager: walletManager)
         stellarKitManager = StellarKitManager(restoreStateManager: restoreStateManager, marketKit: marketKit, walletManager: walletManager)
 
+        // XRP: pending ripple-kit -> let rippleKitManager = RippleKitManager(...); rippleAccountManager = RippleAccountManager(...)
+
         solanaRpcSourceManager = SolanaRpcSourceManager(
             blockchainSettingsStorage: blockchainSettingsStorage,
             marketKit: marketKit
